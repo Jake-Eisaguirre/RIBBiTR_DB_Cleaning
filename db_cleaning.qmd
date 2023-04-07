@@ -52,6 +52,16 @@ full_pan <-  tbl(connection, "location") %>%
 
 ### Explore Panama Data for Errors
 ```{r}
+colnames(full_pan)
 
+unique(full_pan$location)
+
+unique(full_pan$region)
+
+unique(full_pan$site)
+
+unique(full_pan$utme) # site:silenciosa missing cordinates
+
+unique(full_pan$qaqc_survey)
 ```
 
