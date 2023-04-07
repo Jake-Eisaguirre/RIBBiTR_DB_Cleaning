@@ -1,0 +1,57 @@
+---
+title: "cleaning"
+format: revealjs
+editor: visual
+---
+
+```{r}
+if (!require(librarian)){
+  install.packages("librarian")
+  library(librarian)
+}
+# librarian downloads, if not already downloaded, and reads in needed packages
+librarian::shelf(tidyverse, here, janitor, lubridate, RPostgres, DBI, dbplyr)
+```
+
+## Connect to DB
+```{r}
+tryCatch({
+    drv <- dbDriver("Postgres")
+    print("Connecting to Database…")
+    connection <- dbConnect(drv,
+                 dbname = Sys.getenv("aws_dbname"),
+                 host = Sys.getenv("aws_host"),
+                 port = Sys.getenv("aws_port"),
+                 user = Sys.getenv("aws_user"),
+                 password = Sys.getenv("aws_password"),
+                 timezone=NULL)
+    print("Database Connected!")
+    },
+    error=function(cond) {
+            print("Unable to connect to Database.")
+    })
+
+
+dbExecute(connection, "set search_path to 'survey_data'")
+```
+
+## Full Panama
+```{r}
+full_pan <-  tbl(connection, "location") %>% 
+  inner_join(tbl(connection, "region"), by = c("location_id")) %>% 
+  inner_join(tbl(connection, "site"), by = c("region_id")) %>% 
+  inner_join(tbl(connection, "visit"), by = c("site_id")) %>% 
+  inner_join(tbl(connection, "survey"), by = c("visit_id")) %>% 
+  inner_join(tbl(connection, "capture"), by = c("survey_id")) %>% 
+  filter(location == "panama") %>% 
+  collect() %>% 
+  remove_empty("cols")
+
+
+```
+
+### Explore Panama Data for Errors
+```{r}
+
+```
+
